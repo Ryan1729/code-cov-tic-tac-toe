@@ -1,5 +1,5 @@
-pub fn main() {
-    println!("Hello, world!");
+pub fn main() -> i32 {
+    2 + 2
 }
 
 #[cfg(test)]
@@ -7,6 +7,6 @@ mod tests {
     use super::*;
     #[test]
     fn it_works() {
-        main();
+        assert_eq!(main(), 4);
     }
 }
