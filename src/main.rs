@@ -1,12 +1,8 @@
-fn main() {
-    println!("Hello, world!");
-}
+// grcov_excl_start
+mod ttt;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn it_works() {
-        main();
-    }
+fn main() {
+    ttt::main();
 }
+// grcov_excl_stop
+
