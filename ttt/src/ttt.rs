@@ -1,1 +1,1 @@
-pub const K: i32 = 4;
+pub fn run() -> i32 { return 4 }

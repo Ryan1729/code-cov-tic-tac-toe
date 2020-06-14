@@ -1,3 +1,3 @@
 fn main() {
-    ttt::K;
+    ttt::run();
 }
