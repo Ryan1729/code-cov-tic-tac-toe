@@ -9,4 +9,10 @@ mod tests {
     fn it_works() {
         assert_eq!(main(), 4);
     }
+
+    #[test]
+    fn it_works2() {
+        it_works();
+        assert_eq!(main(), 4);
+    }
 }
