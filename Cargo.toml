@@ -4,3 +4,7 @@ members = [
     "run_ttt",
     "ttt",
 ]
+
+[profile.test]
+opt-level = 1
+codegen-units = 1
