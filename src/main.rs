@@ -1,3 +1,4 @@
+
 fn main() {
     fact(5);
 }
@@ -22,7 +23,21 @@ mod tests {
     }
 
     #[test]
-    fn fact_0_is_1() {
+    fn fact_returns_expected_values_for_all_inputs() {
         assert_eq!(fact(0), 1);
+        assert_eq!(fact(1), 1);
+        assert_eq!(fact(2), 2);
+        assert_eq!(fact(3), 6);
+        assert_eq!(fact(4), 24);
+        assert_eq!(fact(5), 120);
+
+        let max_value = u8::max_value();
+        let mut i = 6;
+        while i < max_value {
+            assert_eq!(fact(i), 0);
+            i = i.wrapping_add(1);
+        }
+
+        assert_eq!(fact(max_value), 0);
     }
 }
