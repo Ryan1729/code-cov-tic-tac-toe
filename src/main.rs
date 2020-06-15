@@ -4,9 +4,9 @@ fn main() {
 
 fn fact(x: u8) -> u8 {
     if x <= 1 {
-        0
+        1
     } else {
-        fact(0)
+        x * fact(x - 1)
     }
 }
 
@@ -14,7 +14,7 @@ fn fact(x: u8) -> u8 {
 mod tests {
     use super::*;
     #[test]
-    fn it_works() {
+    fn main_does_not_panic() {
         main();
     }
 }

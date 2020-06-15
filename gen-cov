@@ -9,7 +9,7 @@ cargo clean
 
 export CARGO_INCREMENTAL=0
 
-cargo +nightly rustc -- --test -C link-dead-code -Z profile -C panic=abort -Z panic_abort_tests
+cargo +nightly rustc -- --test -C link-dead-code -Z profile -C panic=abort -Z panic_abort_tests -Z force-overflow-checks=off
 
 exit_if_errors
 
