@@ -20,7 +20,7 @@ read -p 'run the binary in `'"$deps_folder"'` (TAB should autocomplete it)
 ' -i "$deps_folder" -e prompt_acc
 
 # without this we get less coverage reported sometimes
-export RUST_TEST_THREADS = 1
+export RUST_TEST_THREADS=1
 
 eval "$prompt_acc"
 

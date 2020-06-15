@@ -18,11 +18,44 @@ where
     R: BufRead,
     W: Write,
 {
-    let mut s = String::new();
-    reader.read_line(&mut s)?;
-    write!(&mut writer, "{}", s)?;
-    
-    Ok(())
+    enum State {
+        Game,
+        ConfirmQuit,
+    }
+    use State::*;
+
+    let mut state = Game;
+
+    loop {
+        let mut buffer = String::new();
+        reader.read_line(&mut buffer)?;
+
+        if let Some(c) = buffer.chars().next() {
+            match state {
+                Game => {
+                    match c {
+                        '0' => {
+                            state = ConfirmQuit;
+                        }
+                        _ => {}
+                    }
+                }
+                ConfirmQuit => {
+                    match c {
+                        '0' => {
+                            state = Game;
+                        }
+                        '1' => {
+                            write!(&mut writer, "bye")?;
+                            return Ok(());
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            
+        }
+    }
 }
 
 #[cfg(test)]
@@ -31,5 +64,18 @@ mod tests {
     #[test]
     fn main_does_not_panic() {
         let _ = main();
+    }
+
+    #[test]
+    fn run_allows_quitting() {
+        let input = b"0\n1\n";
+        let mut output = Vec::new();
+    
+        run(&input[..], &mut output).unwrap();
+
+        let output = String::from_utf8(output)
+            .expect("output contained Non UTF-8 bytes");
+
+        assert!(output.contains("bye"));
     }
 }
