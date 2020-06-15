@@ -26,8 +26,8 @@ where
 
     let mut state = Game;
 
+    let mut buffer = String::new();
     loop {
-        let mut buffer = String::new();
         reader.read_line(&mut buffer)?;
 
         if let Some(c) = buffer.chars().next() {
@@ -53,8 +53,9 @@ where
                     }
                 }
             }
-            
         }
+
+        buffer.clear();
     }
 }
 
@@ -77,5 +78,28 @@ mod tests {
             .expect("output contained Non UTF-8 bytes");
 
         assert!(output.contains("bye"));
+    }
+
+    #[test]
+    fn run_terminates_on_an_initial_read_error() {
+        let mut output = Vec::new();
+    
+        let _ = run(FailingReader, &mut output);
+    }
+
+    struct FailingReader;
+
+    impl BufRead for FailingReader {
+        fn fill_buf(&mut self) -> io::Result<&[u8]> {
+            Err(io::Error::new(io::ErrorKind::Other, "FailingReader fill_buf error"))
+        }
+
+        fn consume(&mut self, _: usize) {}
+    }
+
+    impl io::Read for FailingReader {
+        fn read(&mut self, _: &mut [u8]) -> io::Result<usize> { 
+            Err(io::Error::new(io::ErrorKind::Other, "FailingReader read error"))
+        }
     }
 }
