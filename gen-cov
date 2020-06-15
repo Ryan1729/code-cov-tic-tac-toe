@@ -9,7 +9,7 @@ cargo clean
 
 export CARGO_INCREMENTAL=0
 
-cargo +nightly rustc -- --test -C link-dead-code -Z profile -C panic=abort -Z panic_abort_tests -Z force-overflow-checks=off
+cargo +nightly rustc -- --test -C link-dead-code -Z profile -C panic=abort -Z panic_abort_tests
 
 exit_if_errors
 
@@ -18,6 +18,9 @@ prompt_acc=''
 
 read -p 'run the binary in `'"$deps_folder"'` (TAB should autocomplete it)
 ' -i "$deps_folder" -e prompt_acc
+
+# without this we get less coverage reported sometimes
+export RUST_TEST_THREADS = 1
 
 eval "$prompt_acc"
 
