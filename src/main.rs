@@ -2,11 +2,13 @@ fn main() {
     fact(5);
 }
 
-fn fact(x: u8) -> u8 {
-    if x <= 1 {
-        1
-    } else {
-        x * fact(x - 1)
+fn fact(n: u8) -> u8 {
+    match n.checked_sub(1) {
+        None => 1,
+        Some(n_minus_1) => {
+            n.checked_mul(fact(n_minus_1))
+                .unwrap_or_default()
+        }
     }
 }
 
@@ -16,5 +18,10 @@ mod tests {
     #[test]
     fn main_does_not_panic() {
         main();
+    }
+
+    #[test]
+    fn fact_0_is_1() {
+        assert_eq!(fact(0), 1);
     }
 }
