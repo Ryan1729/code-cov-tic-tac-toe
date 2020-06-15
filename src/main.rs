@@ -62,6 +62,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Read;
     #[test]
     fn main_does_not_panic() {
         let _ = main();
@@ -97,9 +98,19 @@ mod tests {
         fn consume(&mut self, _: usize) {}
     }
 
-    impl io::Read for FailingReader {
+    impl Read for FailingReader {
         fn read(&mut self, _: &mut [u8]) -> io::Result<usize> { 
             Err(io::Error::new(io::ErrorKind::Other, "FailingReader read error"))
+        }
+    }
+
+    mod meta {
+        use super::*;
+        #[test]
+        fn failing_reader_terminates() {
+            let _ = FailingReader.read(&mut []);
+            let _ = FailingReader.fill_buf();
+            let _ = FailingReader.consume(0);
         }
     }
 }
