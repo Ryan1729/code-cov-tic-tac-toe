@@ -1,18 +1,27 @@
-use std::io::{self, BufRead};
+use std::io::{self, BufRead, Write};
 
 fn main() -> io::Result<()> {
     let stdin = io::stdin();
-    let mut input = stdin.lock();
+    let input = stdin.lock();
+
+    let output = io::stdout();
 
     if cfg!(test) {
         return Ok(());
     }
 
-    let mut buffer = String::new();
-    input.read_line(&mut buffer)?;
+    run(input, output)    
+}
 
-    print!("{}", buffer);
-
+fn run<R, W>(mut reader: R, mut writer: W) -> io::Result<()>
+where
+    R: BufRead,
+    W: Write,
+{
+    let mut s = String::new();
+    reader.read_line(&mut s)?;
+    write!(&mut writer, "{}", s)?;
+    
     Ok(())
 }
 
