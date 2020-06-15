@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-06-15 01:07:21</td>
+            <td class="headerValue">2020-06-15 01:22:30</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">6</td>
@@ -57,8 +57,8 @@
             <td></td>
             <td class="headerItem">Branches:</td>
             <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntry">3</td>
-            <td class="headerCovTableEntryLo">66.7 %</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -81,28 +81,29 @@
 <a name="3"><span class="lineNum">       3 </span>                :<span class="lineCov">          1 : }</span></a>
 <a name="4"><span class="lineNum">       4 </span>                :            : </a>
 <a name="5"><span class="lineNum">       5 </span>                :<span class="lineCov">          7 : fn fact(n: u8) -&gt; u8 {</span></a>
-<a name="6"><span class="lineNum">       6 </span>                :<span class="lineCov">         14 :     match n.checked_sub(1) {</span></a>
-<a name="7"><span class="lineNum">       7 </span>     [<span class="branchCov" title="Branch 0 was taken 5 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span><span class="branchCov" title="Branch 2 was taken 2 times"> + </span>]:<span class="lineCov">          7 :         None =&gt; 1,</span></a>
-<a name="8"><span class="lineNum">       8 </span>                :<span class="lineCov">          5 :         Some(n_minus_1) =&gt; {</span></a>
-<a name="9"><span class="lineNum">       9 </span>                :<span class="lineCov">          5 :             n.checked_mul(fact(n_minus_1))</span></a>
-<a name="10"><span class="lineNum">      10 </span>                :            :                 .unwrap_or_default()</a>
-<a name="11"><span class="lineNum">      11 </span>                :            :         }</a>
-<a name="12"><span class="lineNum">      12 </span>                :            :     }</a>
-<a name="13"><span class="lineNum">      13 </span>                :<span class="lineCov">          7 : }</span></a>
-<a name="14"><span class="lineNum">      14 </span>                :            : </a>
-<a name="15"><span class="lineNum">      15 </span>                :            : #[cfg(test)]</a>
-<a name="16"><span class="lineNum">      16 </span>                :            : mod tests {</a>
-<a name="17"><span class="lineNum">      17 </span>                :            :     use super::*;</a>
-<a name="18"><span class="lineNum">      18 </span>                :            :     #[test]</a>
-<a name="19"><span class="lineNum">      19 </span>                :<span class="lineCov">          2 :     fn main_does_not_panic() {</span></a>
-<a name="20"><span class="lineNum">      20 </span>                :<span class="lineCov">          1 :         main();</span></a>
-<a name="21"><span class="lineNum">      21 </span>                :<span class="lineCov">          2 :     }</span></a>
-<a name="22"><span class="lineNum">      22 </span>                :            : </a>
-<a name="23"><span class="lineNum">      23 </span>                :            :     #[test]</a>
-<a name="24"><span class="lineNum">      24 </span>                :<span class="lineCov">          2 :     fn fact_0_is_1() {</span></a>
-<a name="25"><span class="lineNum">      25 </span>                :            :         assert_eq!(fact(0), 1);</a>
-<a name="26"><span class="lineNum">      26 </span>                :<span class="lineCov">          2 :     }</span></a>
-<a name="27"><span class="lineNum">      27 </span>                :            : }</a>
+<a name="6"><span class="lineNum">       6 </span>                :<span class="lineCov">          7 :     let difference = n.checked_sub(1);</span></a>
+<a name="7"><span class="lineNum">       7 </span>                :            : </a>
+<a name="8"><span class="lineNum">       8 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 5 times"> + </span>]:<span class="lineCov">         12 :     if let Some(n_minus_1) = difference {</span></a>
+<a name="9"><span class="lineNum">       9 </span>                :<span class="lineCov">          5 :         n.checked_mul(fact(n_minus_1))</span></a>
+<a name="10"><span class="lineNum">      10 </span>                :            :             .unwrap_or_default()</a>
+<a name="11"><span class="lineNum">      11 </span>                :            :     } else {</a>
+<a name="12"><span class="lineNum">      12 </span>                :<span class="lineCov">          2 :         1</span></a>
+<a name="13"><span class="lineNum">      13 </span>                :            :     }</a>
+<a name="14"><span class="lineNum">      14 </span>                :<span class="lineCov">          7 : }</span></a>
+<a name="15"><span class="lineNum">      15 </span>                :            : </a>
+<a name="16"><span class="lineNum">      16 </span>                :            : #[cfg(test)]</a>
+<a name="17"><span class="lineNum">      17 </span>                :            : mod tests {</a>
+<a name="18"><span class="lineNum">      18 </span>                :            :     use super::*;</a>
+<a name="19"><span class="lineNum">      19 </span>                :            :     #[test]</a>
+<a name="20"><span class="lineNum">      20 </span>                :<span class="lineCov">          2 :     fn main_does_not_panic() {</span></a>
+<a name="21"><span class="lineNum">      21 </span>                :<span class="lineCov">          1 :         main();</span></a>
+<a name="22"><span class="lineNum">      22 </span>                :<span class="lineCov">          2 :     }</span></a>
+<a name="23"><span class="lineNum">      23 </span>                :            : </a>
+<a name="24"><span class="lineNum">      24 </span>                :            :     #[test]</a>
+<a name="25"><span class="lineNum">      25 </span>                :<span class="lineCov">          2 :     fn fact_0_is_1() {</span></a>
+<a name="26"><span class="lineNum">      26 </span>                :            :         assert_eq!(fact(0), 1);</a>
+<a name="27"><span class="lineNum">      27 </span>                :<span class="lineCov">          2 :     }</span></a>
+<a name="28"><span class="lineNum">      28 </span>                :            : }</a>
 </pre>
       </td>
     </tr>

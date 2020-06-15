@@ -3,12 +3,13 @@ fn main() {
 }
 
 fn fact(n: u8) -> u8 {
-    match n.checked_sub(1) {
-        None => 1,
-        Some(n_minus_1) => {
-            n.checked_mul(fact(n_minus_1))
-                .unwrap_or_default()
-        }
+    let difference = n.checked_sub(1);
+
+    if let Some(n_minus_1) = difference {
+        n.checked_mul(fact(n_minus_1))
+            .unwrap_or_default()
+    } else {
+        1
     }
 }
 
