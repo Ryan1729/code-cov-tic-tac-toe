@@ -28,7 +28,13 @@ where
 
     let mut buffer = String::new();
     loop {
-        reader.read_line(&mut buffer)?;
+        let read_res = reader.read_line(&mut buffer);
+
+        let is_err = read_res.is_err();
+
+        if is_err {
+            return Err(read_res.unwrap_err());
+        }
 
         if let Some(c) = buffer.chars().next() {
             match state {
