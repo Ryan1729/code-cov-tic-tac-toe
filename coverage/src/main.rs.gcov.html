@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2020-06-14 19:20:54</td>
+            <td class="headerValue">2020-06-14 19:26:52</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">4</td>
@@ -56,9 +56,9 @@
 </td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">4</td>
-            <td class="headerCovTableEntry">6</td>
-            <td class="headerCovTableEntryLo">66.7 %</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -80,13 +80,13 @@
 <a name="2"><span class="lineNum">       2 </span>                :<span class="lineCov">          1 :     fact(5);</span></a>
 <a name="3"><span class="lineNum">       3 </span>                :<span class="lineCov">          1 : }</span></a>
 <a name="4"><span class="lineNum">       4 </span>                :            : </a>
-<a name="5"><span class="lineNum">       5 </span>                :<span class="lineCov">          5 : fn fact(x: u8) -&gt; u8 {</span></a>
-<a name="6"><span class="lineNum">       6 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          9 :     if x &lt;= 1 {</span></a>
+<a name="5"><span class="lineNum">       5 </span>                :<span class="lineCov">          2 : fn fact(x: u8) -&gt; u8 {</span></a>
+<a name="6"><span class="lineNum">       6 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 1 time"> + </span>]:<span class="lineCov">          2 :     if x &lt;= 1 {</span></a>
 <a name="7"><span class="lineNum">       7 </span>                :<span class="lineCov">          1 :         0</span></a>
 <a name="8"><span class="lineNum">       8 </span>                :            :     } else {</a>
-<a name="9"><span class="lineNum">       9 </span>[<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 1 was not taken"> - </span>][<span class="branchCov" title="Branch 2 was taken 4 times"> + </span><span class="branchNoCov" title="Branch 3 was not taken"> - </span>]:<span class="lineCov">          4 :         x * fact(x - 1)</span></a>
+<a name="9"><span class="lineNum">       9 </span>                :<span class="lineCov">          1 :         fact(0)</span></a>
 <a name="10"><span class="lineNum">      10 </span>                :            :     }</a>
-<a name="11"><span class="lineNum">      11 </span>                :<span class="lineCov">          5 : }</span></a>
+<a name="11"><span class="lineNum">      11 </span>                :<span class="lineCov">          2 : }</span></a>
 <a name="12"><span class="lineNum">      12 </span>                :            : </a>
 <a name="13"><span class="lineNum">      13 </span>                :            : #[cfg(test)]</a>
 <a name="14"><span class="lineNum">      14 </span>                :            : mod tests {</a>

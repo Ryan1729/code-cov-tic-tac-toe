@@ -6,7 +6,7 @@ fn fact(x: u8) -> u8 {
     if x <= 1 {
         0
     } else {
-        x * fact(x - 1)
+        fact(0)
     }
 }
 
