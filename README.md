@@ -7,3 +7,7 @@ The results were not very good. It turned out that with a no dependencies applic
 Since the tooling at the time made maintaining branch coverage more difficult that it would otherwise be, I did not maintain that for very long. Still, just the raw numbers of branches suggest that maintaining that would indeed be impractical in almost all cases, even if to apparently impossible to take branches around pattern matches were filtered out.
 
 The actual project technically works but is not a good tic-tac-toe AI, (it's pretty easy to win where it should be able to consistently tie). Some tests pointing out specific issues are commented out. Fixing the issues is left "as an exercise the the reader".
+
+## LICENSE
+
+MIT or Apache 2.0 at your option
