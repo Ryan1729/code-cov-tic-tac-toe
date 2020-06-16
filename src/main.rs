@@ -52,8 +52,8 @@ where
                         _ => {}
                     }
                 }
-                _ => {
-                    unreachable!();
+                _ => unsafe {
+                    std::hint::unreachable_unchecked();
                 }
             }
         }
