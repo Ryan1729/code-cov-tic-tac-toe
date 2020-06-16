@@ -36,7 +36,27 @@ fn program_move(board: Board) -> ProgramMove {
         O,
     }
 
+    fn spaces_are_line(s1: Space, s2: Space, s3: Space) -> bool {
+        match (s1, s2, s3) {
+            (X, X, X) | (O, O, O) => true,
+            _ => false,
+        }
+    }
+
     fn helper(board: Board, player: Player) -> ProgramMove {
+        if {
+            spaces_are_line(board[0], board[1], board[2]) 
+            || spaces_are_line(board[3], board[4], board[5])
+            || spaces_are_line(board[6], board[7], board[8])
+            || spaces_are_line(board[0], board[3], board[6])
+            || spaces_are_line(board[1], board[4], board[7])
+            || spaces_are_line(board[2], board[5], board[8])
+            || spaces_are_line(board[0], board[4], board[8])
+            || spaces_are_line(board[2], board[4], board[6])
+        } {
+            return GameIsOver;
+        }
+
         let blank_indicies: Vec<_> = board
             .iter()
             .enumerate()
