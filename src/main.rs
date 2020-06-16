@@ -25,89 +25,120 @@ const LENGTH: usize = 9;
 type Board = [Space; LENGTH];
 
 enum ProgramMove {
-    GameIsOver,
+    OtherPlayerWins,
+    CatsGame,
     Move(usize, bool),
 }
 use ProgramMove::*;
 
-fn program_move(board: Board) -> ProgramMove {
-    enum Player {
-        X,
-        O,
+#[derive(Clone, Copy, PartialEq)]
+enum Player {
+    X,
+    O,
+}
+
+fn spaces_are_line(s1: Space, s2: Space, s3: Space) -> Option<Player> {
+    match (s1, s2, s3) {
+        (X, X, X) => Some(Player::X),
+        (O, O, O) => Some(Player::O),
+        _ => None,
     }
+}
 
-    fn spaces_are_line(s1: Space, s2: Space, s3: Space) -> bool {
-        match (s1, s2, s3) {
-            (X, X, X) | (O, O, O) => true,
-            _ => false,
-        }
-    }
+fn winner_for_board(board: Board) -> Option<Player> {
+    spaces_are_line(board[0], board[1], board[2])
+    .or_else(|| spaces_are_line(board[3], board[4], board[5]))
+    .or_else(|| spaces_are_line(board[6], board[7], board[8]))
+    .or_else(|| spaces_are_line(board[0], board[3], board[6]))
+    .or_else(|| spaces_are_line(board[1], board[4], board[7]))
+    .or_else(|| spaces_are_line(board[2], board[5], board[8]))
+    .or_else(|| spaces_are_line(board[0], board[4], board[8]))
+    .or_else(|| spaces_are_line(board[2], board[4], board[6]))
+}
 
-    fn helper(board: Board, player: Player) -> ProgramMove {
-        if {
-            spaces_are_line(board[0], board[1], board[2]) 
-            || spaces_are_line(board[3], board[4], board[5])
-            || spaces_are_line(board[6], board[7], board[8])
-            || spaces_are_line(board[0], board[3], board[6])
-            || spaces_are_line(board[1], board[4], board[7])
-            || spaces_are_line(board[2], board[5], board[8])
-            || spaces_are_line(board[0], board[4], board[8])
-            || spaces_are_line(board[2], board[4], board[6])
-        } {
-            return GameIsOver;
-        }
-
-        let blank_indicies: Vec<_> = board
-            .iter()
-            .enumerate()
-            .filter_map(|(i, s)| {
-                if let Blank = s { Some(i) } else { None }
-            })
-            .collect();
-
-        if blank_indicies.len() == 0 {
-            GameIsOver
+fn score_for_board(board: Board, player: Player) -> i8 {
+    if let Some(winner) = winner_for_board(board) { 
+        return if winner == Player::O {
+            1
         } else {
-            let mut potential_moves = std::collections::VecDeque::with_capacity(
-                LENGTH
-            );
-
-            for i in blank_indicies {
-                let mut board_after_1_turn = board.clone();
-
-                board_after_1_turn[i] = match player {
-                    Player::X => X,
-                    Player::O => O,
-                };
-
-                let other_player = match player {
-                    Player::X => Player::O,
-                    Player::O => Player::X,
-                };
-
-                match helper(board_after_1_turn, other_player) {
-                    Move(_, true) => {
-                        // probably a bad move
-                        potential_moves.push_back(i);
-                    }
-                    GameIsOver => {
-                        // always take a win.
-                        return Move(i, true);
-                    }
-                    Move(_, false) => {
-                        // possibly a good move
-                        potential_moves.push_front(i);
-                    }
-                }
-            }
-
-            assert!(potential_moves.len() > 0);
-
-            Move(potential_moves.pop_front().unwrap(), false)
-        }
+            -1
+        };
     }
 
-    helper(board, Player::O)
+    let blank_indicies: Vec<_> = board
+        .iter()
+        .enumerate()
+        .filter_map(|(i, s)| {
+            if let Blank = s { Some(i) } else { None }
+        })
+        .collect();
+
+    if blank_indicies.len() == 0 {
+        0
+    } else {
+        let mut max_score = i8::min_value();
+
+        for i in blank_indicies {
+           let other_player = match player {
+                Player::X => Player::O,
+                Player::O => Player::X,
+            };
+
+            let mut board_after_1_turn = board.clone();
+
+            board_after_1_turn[i] = match other_player {
+                Player::X => X,
+                Player::O => O,
+            };
+
+            max_score = std::cmp::max(
+                max_score,
+                // bad score for them is good score for us and vice versa.
+                -score_for_board(board_after_1_turn, other_player)
+            );
+        }
+
+        max_score
+    }
+}
+
+fn program_move(board: Board) -> ProgramMove {
+    if winner_for_board(board).is_some() { 
+        return OtherPlayerWins;
+    }
+
+    let blank_indicies: Vec<_> = board
+        .iter()
+        .enumerate()
+        .filter_map(|(i, s)| {
+            if let Blank = s { Some(i) } else { None }
+        })
+        .collect();
+
+    if blank_indicies.len() == 0 {
+        CatsGame
+    } else {
+        let mut potential_moves = Vec::with_capacity(
+            LENGTH
+        );
+
+        for i in blank_indicies {
+            let mut board_after_1_turn = board.clone();
+
+            board_after_1_turn[i] = O;
+
+            potential_moves.push((
+                i,
+                score_for_board(board, Player::O),
+            ));
+        }
+
+        potential_moves.sort_by_key(|(_, key)| key.clone());
+
+        assert!(potential_moves.len() > 0);
+
+        Move(potential_moves.last().unwrap().0, false)
+    }
 }
 
 fn run<R, W>(mut reader: R, mut writer: W) -> io::Result<()>
@@ -211,13 +242,19 @@ r#"
                                     board[index] = X;
 
                                     match program_move(board) {
-                                        GameIsOver => {
+                                        OtherPlayerWins => {
                                             write_board!();
                                             write!(
                                                 &mut writer,
                                                 "You win! Congrats!\n"
                                             )?;
                                             clear_board!();
+                                        }
+                                        CatsGame => {
+                                            write!(
+                                                &mut writer,
+                                                "Cat's game. Humph!\n"
+                                            )?;
                                         }
                                         Move(i, did_win) => {
                                             board[i] = O;
@@ -373,8 +410,145 @@ mod tests {
     }
 
     #[test]
+    fn program_move_returns_other_player_wins_on_this_game_where_x_has_won() {
+        let board = [
+            X, Blank, Blank, 
+            X,     X,     O,
+            X,     O,     O,
+        ];
+
+        match program_move(board) {
+            OtherPlayerWins => {
+                assert!(true);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn program_move_returns_cats_game_on_tied_game() {
+        let board = [
+            X,     O,     X,
+            O,     X,     X,
+            O,     X,     O,
+        ];
+
+        match program_move(board) {
+            CatsGame => {
+                assert!(true);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
+/*
+    #[test]
+    fn program_move_chooses_to_block_an_x_line_on_this_board() {
+        let board = [
+                      //v2v
+            X, Blank, Blank, 
+            //v3v
+            Blank, X, Blank,
+
+            X,     O,     O,
+        ];
+
+        match program_move(board) {
+            Move(i, _) => {
+                assert!(i == 2 || i == 3);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
+
+    #[test]
+    fn the_score_for_2_and_3_on_this_board_are_better_than_1_and_5() {
+        let board = [
+                      //v2v
+            X, Blank, Blank, 
+            //v3v
+            Blank, X, Blank,
+
+            X,     O,     O,
+        ];
+
+
+        let mut played_at_1 = board.clone();
+        played_at_1[1] = O;
+        let score_for_1 = score_for_board(played_at_1, Player::O);
+
+        let mut played_at_2 = board.clone();
+        played_at_2[2] = O;
+        let score_for_2 = score_for_board(played_at_2, Player::O);
+
+        let mut played_at_3 = board.clone();
+        played_at_3[3] = O;
+        let score_for_3 = score_for_board(played_at_3, Player::O);
+
+        let mut played_at_5 = board.clone();
+        played_at_5[5] = O;
+        let score_for_5 = score_for_board(played_at_5, Player::O);
+
+        assert!(
+            score_for_1 < score_for_2,
+            "score_for_1 ({}) is not less than score_for_2 ({})",
+            score_for_1,
+            score_for_2
+        );
+        assert!(
+            score_for_5 < score_for_2,
+            "score_for_5 ({}) is not less than score_for_2 ({})",
+            score_for_5,
+            score_for_2
+        );
+
+        assert!(
+            score_for_1 < score_for_3,
+            "score_for_1 ({}) is not less than score_for_3 ({})",
+            score_for_1,
+            score_for_3
+        );
+        assert!(
+            score_for_5 < score_for_3,
+            "score_for_5 ({}) is not less than score_for_3 ({})",
+            score_for_5,
+            score_for_3
+        );
+    }
+
+    #[test]
+    fn program_move_chooses_to_block_an_x_line_on_this_unlikely_board() {
+        let board = [
+                  //v2v
+            X, X, Blank, 
+            O, X, Blank,
+            X, O,     O,
+        ];
+
+        match program_move(board) {
+            Move(i, _) => {
+                assert_eq!(i, 2);
+            }
+            _ => {
+                assert!(false);
+            }
+        }
+    }
+*/
+
+    #[test]
     fn space_is_cloneable() {
         let _ = Space::Blank.clone();
+    }
+
+    #[test]
+    fn player_is_cloneable() {
+        let _ = Player::O.clone();
     }
 
     struct FailingReader;
