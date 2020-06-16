@@ -40,7 +40,7 @@ where
                         _ => {}
                     }
                 }
-                ConfirmQuit => {
+                _ => { // ConfirmQuit or invalid enum
                     match c {
                         '0' => {
                             state = Game;
@@ -51,9 +51,6 @@ where
                         }
                         _ => {}
                     }
-                }
-                _ => unsafe {
-                    std::hint::unreachable_unchecked();
                 }
             }
         }
