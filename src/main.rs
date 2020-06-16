@@ -46,7 +46,7 @@ where
                             state = Game;
                         }
                         '1' => {
-                            write!(&mut writer, "bye")?;
+                            write!(&mut writer, "bye\n")?;
                             return Ok(());
                         }
                         _ => {}
@@ -68,10 +68,20 @@ mod tests {
         let _ = main();
     }
 
-    macro_rules! quit_assert {
-        ($output_vec: ident) => {    
+    macro_rules! output_to_string {
+        ($output_vec: ident) => {{
             let output = String::from_utf8($output_vec)
                 .expect("output contained Non UTF-8 bytes");
+
+            assert!(output.ends_with("\n"));
+
+            output
+        }}
+    }
+
+    macro_rules! quit_assert {
+        ($output_vec: ident) => {
+            let output = output_to_string!($output_vec);
 
             assert!(output.contains("bye"));
         }
