@@ -68,6 +68,15 @@ mod tests {
         let _ = main();
     }
 
+    macro_rules! quit_assert {
+        ($output_vec: ident) => {    
+            let output = String::from_utf8($output)
+                .expect("output contained Non UTF-8 bytes");
+
+            assert!(output.contains("bye"));
+        }
+    }
+
     #[test]
     fn run_allows_quitting() {
         let input = b"0\n1\n";
@@ -75,10 +84,27 @@ mod tests {
     
         run(&input[..], &mut output).unwrap();
 
-        let output = String::from_utf8(output)
-            .expect("output contained Non UTF-8 bytes");
+        quit_assert!(output);
+    }
 
-        assert!(output.contains("bye"));
+    #[test]
+    fn run_allows_deciding_not_to_quit_then_really_quitting() {
+        let input = b"0\n0\n0\n1\n";
+        let mut output = Vec::new();
+    
+        run(&input[..], &mut output).unwrap();
+
+        quit_assert!(output);
+    }
+
+    #[test]
+    fn run_allows_typing_a_non_number_then_quitting() {
+        let input = b"hi\n0\n1\n";
+        let mut output = Vec::new();
+    
+        run(&input[..], &mut output).unwrap();
+
+        quit_assert!(output);
     }
 
     #[test]
