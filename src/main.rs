@@ -13,56 +13,93 @@ fn main() -> io::Result<()> {
     run(input, output)    
 }
 
-fn run<R, W>(mut reader: R, mut writer: W) -> io::Result<()>
+fn run<R, W>(reader: R, writer: W) -> io::Result<()>
 where
     R: BufRead,
     W: Write,
 {
-    enum State {
-        Game,
-        ConfirmQuit,
-    }
-    use State::*;
+    let mut buffer = String::with_capacity(1);
 
-    let mut state = Game;
+    run_game(reader, writer, &mut buffer)
+}
 
-    let mut buffer = String::new();
+#[derive(Clone, Copy, Debug)]
+enum State {
+    Game,
+    ConfirmQuit,
+    Quit,
+}
+
+fn run_game<R, W>(mut reader: R, mut writer: W, buffer: &mut String) -> io::Result<()> 
+where
+    R: BufRead,
+    W: Write,
+{
+    let mut state = State::Game;
+    
+    let mut output;
+
     loop {
-        let read_res = reader.read_line(&mut buffer);
+        let read_res = reader.read_line(buffer);
 
         let is_err = read_res.is_err();
 
         if is_err {
-            return Err(read_res.unwrap_err());
+            output = Err(read_res.unwrap_err());
+            break
         }
 
         if let Some(c) = buffer.chars().next() {
-            match state {
-                Game => {
-                    match c {
-                        '0' => {
-                            state = ConfirmQuit;
-                        }
-                        _ => {}
-                    }
-                }
-                ConfirmQuit => {
-                    match c {
-                        '0' => {
-                            state = Game;
-                        }
-                        '1' => {
-                            write!(&mut writer, "bye")?;
-                            return Ok(());
-                        }
-                        _ => {}
-                    }
-                }
+            output = game_step(&mut writer, &mut state, c);
+
+            if output.is_err() {
+                break;
+            }
+
+            if let State::Quit = state {
+                break;
             }
         }
 
         buffer.clear();
     }
+
+    drop(reader);
+    drop(writer);
+
+    output
+}
+
+fn game_step<W>(writer: &mut W, state: &mut State, c: char) -> io::Result<()>
+where
+    W: Write,
+{
+    use State::*;
+    match state {
+        Game => {
+            match c {
+                '0' => {
+                    *state = ConfirmQuit;
+                }
+                _ => {}
+            }
+        }
+        ConfirmQuit => {
+            match c {
+                '0' => {
+                    *state = Game;
+                }
+                '1' => {
+                    *state = Quit;
+                    return write!(writer, "bye");
+                }
+                _ => {}
+            }
+        }
+        Quit => {}
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
