@@ -21,6 +21,75 @@ enum Space {
 }
 use Space::*;
 
+const LENGTH: usize = 9;
+type Board = [Space; LENGTH];
+
+enum ProgramMove {
+    GameIsOver,
+    Move(usize, bool),
+}
+use ProgramMove::*;
+
+fn program_move(board: Board) -> ProgramMove {
+    enum Player {
+        X,
+        O,
+    }
+
+    fn helper(board: Board, player: Player) -> ProgramMove {
+        let blank_indicies: Vec<_> = board
+            .iter()
+            .enumerate()
+            .filter_map(|(i, s)| {
+                if let Blank = s { Some(i) } else { None }
+            })
+            .collect();
+
+        if blank_indicies.len() == 0 {
+            GameIsOver
+        } else {
+            let mut potential_moves = std::collections::VecDeque::with_capacity(
+                LENGTH
+            );
+
+            for i in blank_indicies {
+                let mut board_after_1_turn = board.clone();
+
+                board_after_1_turn[i] = match player {
+                    Player::X => X,
+                    Player::O => O,
+                };
+
+                let other_player = match player {
+                    Player::X => Player::O,
+                    Player::O => Player::X,
+                };
+
+                match helper(board_after_1_turn, other_player) {
+                    Move(_, true) => {
+                        // probably a bad move
+                        potential_moves.push_back(i);
+                    }
+                    GameIsOver => {
+                        // always take a win.
+                        return Move(i, true);
+                    }
+                    Move(_, false) => {
+                        // possibly a good move
+                        potential_moves.push_front(i);
+                    }
+                }
+            }
+
+            assert!(potential_moves.len() > 0);
+
+            Move(potential_moves.pop_front().unwrap(), false)
+        }
+    }
+
+    helper(board, Player::O)
+}
+
 fn run<R, W>(mut reader: R, mut writer: W) -> io::Result<()>
 where
     R: BufRead,
@@ -31,9 +100,6 @@ where
         ConfirmQuit,
     }
     use State::*;
-
-    const LENGTH: usize = 9;
-    type Board = [Space; LENGTH];
 
     let mut board: Board;
     let mut state: State;
@@ -117,11 +183,6 @@ r#"
         if let Some(c) = buffer.chars().next() {
             match state {
                 Game => {
-                    enum ProgramMove {
-                        GameIsOver,
-                        Move(usize, bool),
-                    }
-                    use ProgramMove::*;
                     macro_rules! handle_selection {
                         ($index: literal) => {{
                             let index = $index;
@@ -129,11 +190,7 @@ r#"
                                 Blank => {
                                     board[index] = X;
 
-                                    let program_move = {
-                                        GameIsOver // TODO
-                                    };
-
-                                    match program_move {
+                                    match program_move(board) {
                                         GameIsOver => {
                                             write_board!();
                                             write!(
