@@ -52,6 +52,9 @@ where
                         _ => {}
                     }
                 }
+                _ => {
+                    unreachable!();
+                }
             }
         }
 
@@ -70,7 +73,7 @@ mod tests {
 
     macro_rules! quit_assert {
         ($output_vec: ident) => {    
-            let output = String::from_utf8($output)
+            let output = String::from_utf8($output_vec)
                 .expect("output contained Non UTF-8 bytes");
 
             assert!(output.contains("bye"));
