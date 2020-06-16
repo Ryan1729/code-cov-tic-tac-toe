@@ -35,8 +35,17 @@ where
     const LENGTH: usize = 9;
     type Board = [Space; LENGTH];
 
-    let mut board: Board = [Blank; LENGTH];
-    let mut state = Game;
+    let mut board: Board;
+    let mut state: State;
+
+    macro_rules! clear_board {
+        () => {
+            board = [Blank; LENGTH];
+            state = Game;
+        }
+    }
+    clear_board!();
+
     let mut buffer = String::new();
 
     macro_rules! space_to_char {
@@ -57,17 +66,14 @@ where
                     _ => '?'
                 },
                 X => 'X',
-                O => '0'
+                O => 'O'
             }
         }}
     }
 
-    write!(&mut writer, "Enter 0 at any time to quit.\n\nEnter the number corresponding to the space to place an X there.")?;
-
-    loop {
-        match state {
-            Game => {
-                write!(&mut writer, 
+    macro_rules! write_board {
+        () => {
+            write!(&mut writer, 
 r#"
 +-----+
 |{6}|{7}|{8}|
@@ -77,16 +83,25 @@ r#"
 |{0}|{1}|{2}|
 +-----+
 "#, 
-                    space_to_char!(0),
-                    space_to_char!(1),
-                    space_to_char!(2),
-                    space_to_char!(3),
-                    space_to_char!(4),
-                    space_to_char!(5),
-                    space_to_char!(6),
-                    space_to_char!(7),
-                    space_to_char!(8),
-                )?;
+                space_to_char!(0),
+                space_to_char!(1),
+                space_to_char!(2),
+                space_to_char!(3),
+                space_to_char!(4),
+                space_to_char!(5),
+                space_to_char!(6),
+                space_to_char!(7),
+                space_to_char!(8),
+            )?;
+        }
+    }
+
+    write!(&mut writer, "Enter 0 at any time to quit.\n\nEnter the number corresponding to the space to place an X there.")?;
+
+    loop {
+        match state {
+            Game => {
+                write_board!();
             }
             _ => { // ConfirmQuit or invalid enum
                 write!(
@@ -102,10 +117,74 @@ r#"
         if let Some(c) = buffer.chars().next() {
             match state {
                 Game => {
+                    enum ProgramMove {
+                        GameIsOver,
+                        Move(usize, bool),
+                    }
+                    use ProgramMove::*;
+                    macro_rules! handle_selection {
+                        ($index: literal) => {{
+                            let index = $index;
+                            match board[index] {
+                                Blank => {
+                                    board[index] = X;
+
+                                    let program_move = {
+                                        GameIsOver // TODO
+                                    };
+
+                                    match program_move {
+                                        GameIsOver => {
+                                            write_board!();
+                                            write!(
+                                                &mut writer,
+                                                "You win! Congrats!\n"
+                                            )?;
+                                            clear_board!();
+                                        }
+                                        Move(i, did_win) => {
+                                            board[i] = O;
+
+                                            if did_win {
+                                                write_board!();
+                                                write!(
+                                                    &mut writer,
+                                                    "I win!\n"
+                                                )?;
+                                                clear_board!();
+                                            }
+                                        }
+                                    }
+                                }
+                                X => {
+                                    write!(
+                                        &mut writer,
+                                        "You already played there!\n"
+                                    )?;
+                                }
+                                O => {
+                                    write!(
+                                        &mut writer,
+                                        "I already played there!\n"
+                                    )?;
+                                }
+                            }
+                        }}
+                    }
+
                     match c {
                         '0' => {
                             state = ConfirmQuit;
                         }
+                        '1' => handle_selection!(0),
+                        '2' => handle_selection!(1),
+                        '3' => handle_selection!(2),
+                        '4' => handle_selection!(3),
+                        '5' => handle_selection!(4),
+                        '6' => handle_selection!(5),
+                        '7' => handle_selection!(6),
+                        '8' => handle_selection!(7),
+                        '9' => handle_selection!(8),
                         _ => {}
                     }
                 }
@@ -184,6 +263,29 @@ mod tests {
         run(&input[..], &mut output).unwrap();
 
         quit_assert!(output);
+    }
+
+    #[test]
+    fn run_allows_playing_each_space_then_quitting() {
+        macro_rules! play {
+            ($input: expr) => {
+                let input = $input;
+                let mut output = Vec::new();
+            
+                run(&input[..], &mut output).unwrap();
+        
+                quit_assert!(output);
+            }
+        }
+        play!(b"1\n0\n1\n");
+        play!(b"2\n0\n1\n");
+        play!(b"3\n0\n1\n");
+        play!(b"4\n0\n1\n");
+        play!(b"5\n0\n1\n");
+        play!(b"6\n0\n1\n");
+        play!(b"7\n0\n1\n");
+        play!(b"8\n0\n1\n");
+        play!(b"9\n0\n1\n");
     }
 
     #[test]
